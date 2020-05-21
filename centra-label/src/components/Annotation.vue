@@ -1,5 +1,5 @@
 <template>
-  <v-stage ref="stage" :config="stageSize">
+  <v-stage ref="stage" :config="stageSize" @mouseup = "update">
     <v-layer ref="background" @click= "drawBox">
       <v-image :config="{
             image: image
@@ -22,8 +22,8 @@ export default {
   data() {
     return {
       stageSize: {
-        width: width,
-        height: height
+        width: 2,
+        height: 2
       },
       image: null,
       boxes: [],
@@ -31,7 +31,8 @@ export default {
       keyPoints: ["foo","foo"],
       rect1: null,
       tr1: null,
-      transformers: []
+      transformers: [],
+      annotationCoordinates: []
     };
   },
   created() {
@@ -42,13 +43,15 @@ export default {
       this.image = image;
     };
     this.clickCounter = 0
+    this.stageSize['height'] = image.height
+    this.stageSize['width'] = image.width
   },
   methods: {
     drawBox() {
       var mousePos = this.$refs.stage.getStage().getPointerPosition();
       var x_mouse = mousePos.x;
       var y_mouse = mousePos.y;
-      console.log("x:" + x_mouse, "y:" + y_mouse)    
+      //console.log("x:" + x_mouse, "y:" + y_mouse)    
       if (this.clickCounter == 0) {
         this.clickCounter ++;
         this.keyPoints[0] = [x_mouse, y_mouse]
@@ -88,11 +91,41 @@ export default {
       //resetting global variables
       this.keyPoints = ["foo","foo"]
       this.clickCounter = 0;
-
+      
+      this.annotationCoordinates.push([
+        this.rect1.getClientRect().x,
+        this.rect1.getClientRect().y,
+        this.rect1.getClientRect().x + this.rect1.getClientRect().width,
+        this.rect1.getClientRect().y + this.rect1.getClientRect().height
+      ])
+      console.log(this.annotationCoordinates)
       //adding rectangle and updating the canvas
       this.$refs.annotation.getNode().add(this.rect1);
       this.$refs.annotation.getNode().draw();
       }
+      },
+
+      update () {
+        //console.log(this.boxes[i])
+        for (let i = 0; i < this.boxes.length; i++) {
+          this.annotationCoordinates[i] = [
+          this.boxes[i].getClientRect().x,
+          this.boxes[i].getClientRect().y,
+          this.boxes[i].getClientRect().x + this.boxes[i].getClientRect().width,
+          this.boxes[i].getClientRect().y + this.boxes[i].getClientRect().height
+          ]
+        } 
+      },
+      deleteBox() {
+        //using array indexes to delete boxes
+        this.boxes[this.boxes.length-1].destroy()
+        this.transformers[this.transformers.length -1].detach()
+        
+        //removing the individual elements from the array
+        this.boxes.pop(); this.transformers.pop()
+
+        //refreshing the layer
+        this.annotations.draw();
       }
   }
 };
