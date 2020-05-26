@@ -1,4 +1,5 @@
 <template>
+<div class="container center">
   <v-stage ref="stage" :config="stageSize" @mouseup = "update">
     <v-layer ref="background" @click= "drawBox">
       <v-image :config="{
@@ -7,6 +8,7 @@
     </v-layer>
         <v-layer ref="annotation"></v-layer>
   </v-stage>
+  </div>
 </template>
 
 <script>
@@ -20,6 +22,8 @@ const width = window.innerWidth;
 const height = window.innerHeight;
 
 export default {
+
+  
   data() {
     return {
       stageSize: {
@@ -34,8 +38,13 @@ export default {
       tr1: null,
       transformers: [],
       annotationCoordinates: []
+     
+      
+      
     };
   },
+
+
   created() {
     const image = new window.Image();
     image.src = "https://konvajs.org/assets/yoda.jpg";
