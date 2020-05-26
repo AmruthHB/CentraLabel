@@ -10,6 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "firebase": "^7.14.5",
     "konva": "^6.0.0",
     "vue": "^2.5.2",
     "vue-konva": "^2.1.3",

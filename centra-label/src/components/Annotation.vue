@@ -13,6 +13,7 @@
 
 import Vue from 'vue';
 import VueKonva from 'vue-konva'
+
 Vue.use(VueKonva)
 
 const width = window.innerWidth;
@@ -45,6 +46,7 @@ export default {
     this.clickCounter = 0
     this.stageSize['height'] = image.height
     this.stageSize['width'] = image.width
+    //console.log(storage.child("/Test-Dataset").listAll())
   },
   methods: {
     drawBox() {
