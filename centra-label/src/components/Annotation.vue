@@ -1,6 +1,6 @@
 <template>
 <div class="container center">
-  <v-stage ref="stage" :config="stageSize" @mouseup = "update">
+  <v-stage ref="stage" :config="stageSize">
     <v-layer ref="background" @click= "drawBox">
       <v-image :config="{
             image: image
@@ -12,56 +12,121 @@
 </template>
 
 <script>
-
+//konva graphics library
 import Vue from 'vue';
 import VueKonva from 'vue-konva'
-
 Vue.use(VueKonva)
 
+//database and storage references for firebase
+import db from '@/firebase/firestoreInit'
+import storage from '@/firebase/storageInit'
+
+//getLink - retrieve HTTPS url given storage filepath
+//getInfo - Get most recently edited image in dataset and return the respective filepath/annotation object for that filepath
+import {getLink, getInfo} from '@/database-scripts/fetchHandler.js'
+import {updateImageAnnotations} from '@/database-scripts/updateHandler.js'
+
+//randomly generate a 10 character string
+import {ID} from "@/database-scripts/randomString.js"
+
+
+//placeholders
 const width = window.innerWidth;
 const height = window.innerHeight;
 
 export default {
-
-  
   data() {
     return {
       stageSize: {
-        width: 2,
-        height: 2
+        width: width,
+        height: height
       },
       image: null,
-      boxes: [],
+      konvaObjects: {},
       clickCounter: 0,
       keyPoints: ["foo","foo"],
       rect1: null,
-      tr1: null,
-      transformers: [],
-      annotationCoordinates: []
-     
-      
-      
-    };
+      tr1: null
+      };
   },
+  async created() {
 
+    //create an imageObject
+    const image = new Image();
 
-  created() {
-    const image = new window.Image();
-    image.src = "https://konvajs.org/assets/yoda.jpg";
+    //prototype directory
+    let datasetDirectory = "Test-Set"
+
+    //retrieve annotation object and url object
+    let currentData = await getInfo(datasetDirectory)
+
+    //annotation object and url object links
+    let currentAnnotations = currentData.annotationObject
+    let currentImage = currentData.link
+
+    //get https url and set it to image source
+    image.src = await getLink(currentImage)
+    
+    //load image
     image.onload = () => {
       // set image only when it is loaded
       this.image = image;
+      this.stageSize['height'] = image.height
+      this.stageSize['width'] = image.width
     };
-    this.clickCounter = 0
-    this.stageSize['height'] = image.height
-    this.stageSize['width'] = image.width
-    //console.log(storage.child("/Test-Dataset").listAll())
+    
+    //bboxObj is the 10 string random ID for each bounding box, the key corresponds to the properties ...
+    // 'boundingBox' - an object with x_min, y_min and so on
+    //'class' - the class of the image
+    for (let bboxObj in currentAnnotations) {
+      this.rect1 = new Konva.Rect({
+          x: currentAnnotations[bboxObj]['boundingBox']['x_min'],
+          y: currentAnnotations[bboxObj]['boundingBox']['y_min'],
+          width: currentAnnotations[bboxObj]['boundingBox']['x_max'] - currentAnnotations[bboxObj]['boundingBox']['x_min'],
+          height: currentAnnotations[bboxObj]['boundingBox']['y_max'] - currentAnnotations[bboxObj]['boundingBox']['y_min'],
+          fill: 'transparent',
+          stroke: 'black',
+          draggable: true,
+          id: bboxObj
+      });
+
+      this.tr1 = new Konva.Transformer({
+          nodes: [this.rect1],
+          centeredScaling: false,
+          rotateEnabled: false,
+          resizeEnabled: true,
+          anchorStroke: 'white',
+          anchorFill: 'blue',
+          anchorSize: 9,
+          borderEnabled: false,
+          ignoreStroke: true,
+          keepRatio: true,
+          borderStroke: 'black'
+      });
+
+      this.konvaObjects[bboxObj] = {
+        transformerObj: this.tr1,
+        rectangeObj: this.rect1
+      }
+      
+      this.rect1.on("transformend", this.updateCoordinatesOnTransform); 
+
+      this.$refs.annotation.getNode().add(this.rect1);
+      this.$refs.annotation.getNode().add(this.tr1);
+      this.$refs.annotation.getNode().draw();
+    }
   },
+
+
   methods: {
+    updateCoordinatesOnTransform(event) {
+      console.log(event.target)
+    },
     drawBox() {
       var mousePos = this.$refs.stage.getStage().getPointerPosition();
       var x_mouse = mousePos.x;
       var y_mouse = mousePos.y;
+
       //console.log("x:" + x_mouse, "y:" + y_mouse)    
       if (this.clickCounter == 0) {
         this.clickCounter ++;
@@ -78,7 +143,7 @@ export default {
           fill: 'transparent',
           stroke: 'black',
           draggable: true,
-          name: this.boxes.length.toString()
+          id: ID()
       });
         this.tr1 = new Konva.Transformer({
           nodes: [this.rect1],
@@ -93,8 +158,13 @@ export default {
           keepRatio: true,
           borderStroke: 'black'
     });
-      this.boxes.push(this.rect1)
-      this.transformers.push(this.tr1)
+      
+      let randomIdentifier = ID()
+
+      this.konvaObjects[randomIdentifier] = {
+        transformerObj: this.rect1,
+        rectangleObj: this.tr1
+      }
 
       //updating layer to include the new transformer
       this.$refs.annotation.getNode().add(this.tr1);
@@ -102,20 +172,25 @@ export default {
       //resetting global variables
       this.keyPoints = ["foo","foo"]
       this.clickCounter = 0;
-      
-      this.annotationCoordinates.push([
-        this.rect1.getClientRect().x,
-        this.rect1.getClientRect().y,
-        this.rect1.getClientRect().x + this.rect1.getClientRect().width,
-        this.rect1.getClientRect().y + this.rect1.getClientRect().height
-      ])
-      console.log(this.annotationCoordinates)
+     
       //adding rectangle and updating the canvas
       this.$refs.annotation.getNode().add(this.rect1);
       this.$refs.annotation.getNode().draw();
+      
+      let temp = {
+          boundingBox: {
+            x_max: this.rect1.getClientRect().x + this.rect1.getClientRect().width,
+            x_min: this.rect1.getClientRect().x,
+            y_max: this.rect1.getClientRect().y + this.rect1.getClientRect().height,
+            y_min: this.rect1.getClientRect().y
+          },
+          class: "cow"
+      }
+
+      updateImageAnnotations("Test-Set", "1", randomIdentifier, temp)
+
       }
       },
-
       update () {
         //console.log(this.boxes[i])
         for (let i = 0; i < this.boxes.length; i++) {
@@ -134,7 +209,6 @@ export default {
         
         //removing the individual elements from the array
         this.boxes.pop(); this.transformers.pop()
-
         //refreshing the layer
         this.annotations.draw();
       }
