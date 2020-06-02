@@ -15,10 +15,7 @@
       <h5>My Annotations</h5>
     <div class="label-box">
       <Box />
-      <Box />
-      <Box />
-      <Box />
-      <Box />
+      
     </div>
     </div>
 

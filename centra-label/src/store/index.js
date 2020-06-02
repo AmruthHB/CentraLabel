@@ -1,17 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import annotations from "./modules/annotations";
  
 Vue.use(Vuex);
  
 export default new Vuex.Store({
- state: {
-    user:{
-        annotationCoords: []
-    }
+ modules: {
+    annotations
 
+ }
 
- },
- getters: {},
- mutations: {},
- actions: {}
 });
