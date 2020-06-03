@@ -33,7 +33,7 @@ import Annotation from './Annotation'
 import Box from './Box'
 
 export default {
-  name: 'Home',
+  name: 'LabelUI',
   components: {
     Annotation:Annotation,
     Box:Box

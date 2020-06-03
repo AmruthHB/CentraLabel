@@ -1,24 +1,21 @@
+
+
+
+
+
 const state = {
     coordinates: [
-        {
-        id:1,
-        xyCoords: [1,2,3,4]
-    },
-    {
-        id:2,
-        xyCoords: [1,2,3,4]
-    },
-    {
-        id:3,
-        xyCoords: [1,2,3,4]
-    }
-    ]
+
+    ],
+
+    currentImg: "ppp"
 
 };
 
 const getters = {
 
-    allCoords: state => state.coordinates
+    allCoords: state => state.coordinates,
+    getImage: state => state.currentImage
 
 };
 

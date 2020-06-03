@@ -33,13 +33,20 @@
 <script>
 
   import {mapGetters} from 'vuex';
+  
+
 
   export default {
   name: "Box",
   computed: mapGetters(["allCoords"]),
   data : {
       label: ""
-    }
+    },
+
+  methods:{
+
+
+  }
 
   }
 

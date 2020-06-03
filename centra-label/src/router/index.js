@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
+import LabelUI from '@/components/LabelUI'
 import Annotations from '@/components/Annotation'
 import test from '@/components/test'
 import Box from '@/components/Box'
+import Dataset from '@/components/Dataset'
+import Upload from '@/components/Upload'
 
 
 Vue.use(Router)
@@ -11,9 +13,24 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'Home',
-      component: Home
+      path: '/LabelUI',
+      name: 'LabelUI',
+      component: LabelUI
+    },
+
+    {
+      path: '/Dataset',
+      name: 'Dataset',
+      component: Dataset
+
+
+    },
+    {
+      path: '/Dataset/UploadDataset',
+      name: "Upload",
+      component: Upload
+
+
     }
   ]
 })
