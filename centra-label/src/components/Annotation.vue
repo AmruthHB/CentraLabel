@@ -137,7 +137,7 @@ export default {
       var x_mouse = mousePos.x;
       var y_mouse = mousePos.y;
       if (e.evt.ctrlKey) {
-        console.log("ctrl pressed on click!")
+        //console.log("ctrl pressed on click!")
       }
       if (this.clickCounter == 0 && e.evt.ctrlKey) {
         this.clickCounter ++;
@@ -175,8 +175,8 @@ export default {
       this.rect1.on("dragend", this.updateCoordinatesOnTransform); 
       
       this.konvaObjects[randomIdentifier] = {
-        transformerObj: this.rect1,
-        rectangleObj: this.tr1
+        rectangleObj: this.rect1,
+        transformerObj: this.tr1
       }
       //updating layer to include the new transformer
       this.$refs.annotation.getNode().add(this.tr1);
@@ -204,7 +204,6 @@ export default {
       },
       deleteBox(idOfImage) {
         deleteElement("Test-Set", "1", idOfImage)
-
         this.konvaObjects[idOfImage].transformerObj.detach()
 
         this.konvaObjects[idOfImage].rectangleObj.destroy()

@@ -12,7 +12,11 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
-
+  {
+    path: '/Annotations',
+    name: 'Annotations',
+    component: Annotations
+  },
     {
       path: '/LabelUI',
       name: 'LabelUI',

@@ -98,6 +98,7 @@
 
     methods: {
       destroyBox: function (item, itemId) {
+        console.log(itemId)
         this.$refs.konvaComp.deleteBox(itemId)
         this.renderCollection.$remove(item)
 
