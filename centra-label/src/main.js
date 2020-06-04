@@ -10,9 +10,11 @@ import store from "./store";
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
-new Vue({
+let vm = new Vue({
   el: '#app',
   router,store,
   components: { App },
   template: '<App/>'
 })
+
+

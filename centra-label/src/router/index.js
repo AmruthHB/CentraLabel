@@ -12,11 +12,13 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
+
     {
       path: '/LabelUI',
       name: 'LabelUI',
       component: LabelUI
     },
+   
 
     {
       path: '/Dataset',
