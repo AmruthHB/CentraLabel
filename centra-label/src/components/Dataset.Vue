@@ -1,5 +1,3 @@
-
-
 <template>
 
 <div class = "container">
@@ -9,29 +7,24 @@
     </div>
 
      <div class = "row center">
-        <a  @click = "uploadMenu()"  class="waves-effect waves-light btn-large">Upload Dataset</a> 
+        <a @click = "uploadMenu()"  class="waves-effect waves-light btn-large">Upload Dataset</a> 
     </div>
 
      <div class = "row center">
         <a class="waves-effect waves-light btn-large">My Datasets</a>
     </div>
-
-
-    
-  
 </div>
 </template>
 
 <script>
-import UploadVue from "./Upload.vue";
+import Upload from "./Upload";
 
 export default {
     Name: "Dataset",
     methods:{
-        uploadMenu: function(event){
+        uploadMenu: function(e){
             //route for some reason says undefined in browser yet works, check that out
-            let currentRoute = this.$router.currentRoute.stringifyPath
-            this.$router.push(`${currentRoute}/UploadDataset`)
+            this.$router.push("/UploadDataset")
         }
 
     }

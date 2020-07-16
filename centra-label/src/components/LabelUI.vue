@@ -18,7 +18,9 @@
             <div class="card-content">
 
               <div class="row center">
-                <input v-model="label" placeholder="Label" type="text" class="center label validate">
+              <div class="input-field">
+              <input v-model="label" placeholder="Label" type="text" class="center label validate">
+              </div>
               </div>
 
               <div class="row center">
@@ -50,7 +52,7 @@
 
         <div class="col s6">
           <!-- On click event listener here -->
-          <button class="btn waves-effect waves-light" name="action">
+          <button class="btn waves-effect waves-light " name="action">
             <i class="material-icons right">arrow_back</i>
           </button>
 
@@ -82,6 +84,7 @@
   import Annotation from './Annotation'
   import Box from './Box'
   import db from '@/firebase/firestoreInit'
+  
 
 
   export default {
@@ -141,6 +144,8 @@
     overflow-y: scroll;
     margin-bottom: 80px;
   }
+
+  /*  */
 
   
 

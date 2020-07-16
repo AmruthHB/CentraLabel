@@ -32,7 +32,7 @@ export default new Router({
 
     },
     {
-      path: '/Dataset/UploadDataset',
+      path: '/UploadDataset',
       name: "Upload",
       component: Upload
 
