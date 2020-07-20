@@ -33,7 +33,7 @@
 
     <div class="row center">
 
-      <a   @click= "createDataset()" class="waves-effect waves-light btn"><i class="material-icons left">cloud_upload</i>Upload</a>
+      <a   @click= "runOrder()" class="waves-effect waves-light btn"><i class="material-icons left">cloud_upload</i>Upload</a>
 
     </div>
 
@@ -81,7 +81,13 @@ import {ID} from "@/database-scripts/randomString.js"
         
       },
 
-      createDataset(){
+      runOrder(){
+        this.createDataset()
+        this.createBucket()
+
+      }
+
+      ,createDataset(){
         
         this.showProgress = true
         if(this.datasetName === ""){
@@ -98,6 +104,22 @@ import {ID} from "@/database-scripts/randomString.js"
           }
           this.showProgress = false
       }
+      },
+
+      createBucket(){
+        let newBucket = db.collection(this.datasetName)
+
+        for(let i = 0;i < this.uploadData.length;i++){
+          newBucket.doc((i+1).toString()).set({
+            Annotations: {},
+            filePath: `${this.datasetName}/${i+1}.${this.dataFormat[i]}`
+          }).then(function(){
+
+            newBucket.doc("Current_Image").set({
+              fileName: "1"
+            })
+          })
+        }
       }
     }
 

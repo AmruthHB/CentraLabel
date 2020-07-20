@@ -11,7 +11,7 @@
     </div>
 
      <div class = "row center">
-        <a class="waves-effect waves-light btn-large">My Datasets</a>
+        <a @click = "$router.push('/MyDatasets')" class="waves-effect waves-light btn-large">My Datasets</a>
     </div>
 </div>
 </template>

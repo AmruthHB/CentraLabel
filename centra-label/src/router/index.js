@@ -6,6 +6,8 @@ import test from '@/components/test'
 import Box from '@/components/Box'
 import Dataset from '@/components/Dataset'
 import Upload from '@/components/Upload'
+import Login from '@/components/Login'
+import MyDatasets from '@/components/MyDatasets'
 
 
 Vue.use(Router)
@@ -35,6 +37,20 @@ export default new Router({
       path: '/UploadDataset',
       name: "Upload",
       component: Upload
+
+
+    },
+    {
+      path: '/Login',
+      name: "Login",
+      component: Login
+
+
+    },
+    {
+      path: '/MyDatasets',
+      name: "MyDatasets",
+      component: MyDatasets
 
 
     }
