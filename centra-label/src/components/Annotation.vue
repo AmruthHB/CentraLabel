@@ -46,14 +46,15 @@ export default {
       clickCounter: 0,
       keyPoints: ["foo","foo"],
       rect1: null,
-      tr1: null
+      tr1: null,
+      currentImageReference: null
       };
   },
-  async created() {
+  async beforeMount() {
 
     //create an imageObject
     const image = new Image();
-
+    console.log("Reset")
     //prototype directory
     let datasetDirectory = "Test-Set"
 
@@ -129,7 +130,7 @@ export default {
             y_max: event.target.getClientRect().y + event.target.getClientRect().height,
             y_min: event.target.getClientRect().y
       }
-      updateImageAnnotation("Test-Set", "1", event.target.attrs.id, tempObject)
+      updateImageAnnotation("Test-Set", this.currentImageReference, event.target.attrs.id, tempObject)
       },
 
     drawBox(e) {
@@ -199,11 +200,11 @@ export default {
           class: "cow"
       }
 
-      addImageAnnotation("Test-Set", "1", randomIdentifier, temp)
+      addImageAnnotation("Test-Set", this.currentImageReference, randomIdentifier, temp)
       }
       },
       deleteBox(idOfImage) {
-        deleteElement("Test-Set", "1", idOfImage)
+        deleteElement("Test-Set", this.currentImageReference, idOfImage)
         this.konvaObjects[idOfImage].transformerObj.detach()
 
         this.konvaObjects[idOfImage].rectangleObj.destroy()
@@ -211,9 +212,6 @@ export default {
 
         this.$refs.annotation.getNode().draw();
       },
-      async changeImage(direction) {
-
-      }
   }
 };
 </script>

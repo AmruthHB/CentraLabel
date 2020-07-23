@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col s8 center">
         <h5>Image </h5>
-        <Annotation ref="konvaComp" />
+        <Annotation ref="konvaComp" :key = "componentKey" />
       </div>
 
       <div class="col s4 center ">
@@ -17,11 +17,7 @@
           <div class="card" v-for="a in renderCollection" :key="a.id">
             <div class="card-content">
 
-              <div class="row center">
-              <div class="input-field">
-              <input v-model="label" placeholder="Label" type="text" class="center label validate">
-              </div>
-              </div>
+
 
               <div class="row center">
                 <div class="col s6">
@@ -52,7 +48,7 @@
 
         <div class="col s6">
           <!-- On click event listener here -->
-          <button class="btn waves-effect waves-light " name="action">
+          <button class="btn waves-effect waves-light " name="action" @click = changeImage(1)>
             <i class="material-icons right">arrow_back</i>
           </button>
 
@@ -61,15 +57,12 @@
 
         <div class="col s6">
           <!-- On click event listener here -->
-          <button class="btn waves-effect waves-light" type="submit" name="action">
+          <button class="btn waves-effect waves-light" type="submit" name="action" @click = changeImage(2)>
             <i class="material-icons left">arrow_forward</i>
           </button>
 
 
         </div>
-
-
-
 
       </div>
 
@@ -84,7 +77,8 @@
   import Annotation from './Annotation'
   import Box from './Box'
   import db from '@/firebase/firestoreInit'
-  
+  import {ID} from "@/database-scripts/randomString.js"
+
 
 
   export default {
@@ -95,7 +89,8 @@
     },
     data() {
       return {
-        renderCollection: []
+        renderCollection: [],
+        componentKey: 1
       }
     },
 
@@ -103,33 +98,70 @@
       destroyBox: function (item, itemId) {
         console.log(itemId)
         this.$refs.konvaComp.deleteBox(itemId)
+      },
+      
+      changeImage: async function (imageId) {
+        let datasetDirectory = "Test-Set"
+        let imageReference = await db.collection(datasetDirectory).doc("Current_Image")
+        let updateObject = {}
 
-      }
+        this.$refs.konvaComp.currentImageReference = imageId
+        imageId = imageId.toString();
+        //console.log(imageId)
+        updateObject['fileName'] = imageId
+        await imageReference.update(updateObject)
 
-    },
+        this.componentKey = ID()
 
-    created() {
+        const currentWorkingFileReference = await db.collection("Test-Set").doc("Current_Image").get()
+        const currentWorkingFile = currentWorkingFileReference.data().fileName
 
-      let currentReference = db.collection("Test-Set").doc("1").onSnapshot((doc) => {
+        this.$refs.konvaComp.currentImageReference = currentWorkingFile
 
-        let imageInfo = doc.data().Annotations
-        let iterKeys = Object.keys(imageInfo)
+        //console.log(this.$refs.konvaComp.currentImageReference)
+        let currentReference = db.collection("Test-Set").doc(currentWorkingFile).onSnapshot((doc) => {
 
-        this.renderCollection = []
-        for (let i = 0; i < iterKeys.length; i++) {
+          let imageInfo = doc.data().Annotations
+          let iterKeys = Object.keys(imageInfo)
 
-          let informationObj = {
-            "id": Object.keys(imageInfo)[i],
-            "coords": imageInfo[iterKeys[i]].boundingBox
+          this.renderCollection = []
+          for (let i = 0; i < iterKeys.length; i++) {
+
+            let informationObj = {
+              "id": Object.keys(imageInfo)[i],
+              "coords": imageInfo[iterKeys[i]].boundingBox
+            }
+
+            this.renderCollection.push(informationObj)
           }
 
-          this.renderCollection.push(informationObj)
+        })
+      }
+    },
+    async mounted() {
+      const currentWorkingFileReference = await db.collection("Test-Set").doc("Current_Image").get()
+      const currentWorkingFile = currentWorkingFileReference.data().fileName
+      this.$refs.konvaComp.currentImageReference = currentWorkingFile
+
+      //console.log(this.$refs.konvaComp.currentImageReference)
+      let currentReference = db.collection("Test-Set").doc(currentWorkingFile).onSnapshot((doc) => {
+
+      let imageInfo = doc.data().Annotations
+      let iterKeys = Object.keys(imageInfo)
+
+      this.renderCollection = []
+      for (let i = 0; i < iterKeys.length; i++) {
+
+        let informationObj = {
+          "id": Object.keys(imageInfo)[i],
+          "coords": imageInfo[iterKeys[i]].boundingBox
         }
 
-      })
-
-    }
+        this.renderCollection.push(informationObj)
+      }
+     })
   }
+}
 
 </script>
 
