@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <Navbar />
-    <router-view><Home /> </router-view>
+    <router-view><LabelUI/></router-view>
   </div>
 </template>
 
 <script>
-import LabelUI from '@/components/LabelUI'
-import Navbar from '@/components/Navbar'
+import {LabelUI} from '@/components/AnnotateApi'
+import {Navbar} from '@/components/StaticComponents'
 
 export default {
   name: 'App',

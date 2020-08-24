@@ -75,17 +75,14 @@
 
 <script>
   import Annotation from './Annotation'
-  import Box from './Box'
   import db from '@/firebase/firestoreInit'
   import {ID} from "@/database-scripts/randomString.js"
-
-
 
   export default {
     name: 'LabelUI',
     components: {
       Annotation: Annotation,
-      Box: Box
+      
     },
     data() {
       return {
@@ -138,7 +135,7 @@
         })
       }
     },
-    async mounted() {
+     mounted: async function() {
       const currentWorkingFileReference = await db.collection("Test-Set").doc("Current_Image").get()
       const currentWorkingFile = currentWorkingFileReference.data().fileName
       this.$refs.konvaComp.currentImageReference = currentWorkingFile
@@ -172,7 +169,7 @@
   }
 
   .label-box {
-    height: 40vh;
+    height: 90px;
     overflow-y: scroll;
     margin-bottom: 80px;
   }
