@@ -37,21 +37,14 @@
 
             </div>
              
-            
 
-            
-             <div v-if="showError" class="center">
-              <p class="red-text"> {{registerError}}</p>
-            </div>
-
-            
 
             <div class="form-field">
               <button @click="register()" class="btn-small waves-effect waves-dark red lighten-2"
                 style="width:30%;">Register</button>
             
-              <button @click="$router.push('/Log')" class="btn-small waves-effect waves-dark  lighten-2"
-                style="width:30%;">Login Page</button>
+                <!-- <button @click="$router.push('/login')" class="btn-small waves-effect waves-dark  lighten-2"
+                style="width:30%;">Login Page</button>-->
             </div><br>
 
             <div v-if="showError" class="center">
@@ -66,7 +59,8 @@
 </template>
 
 <script>
-  import {signUp} from '@/firebase/addUser'
+ import auth from '@/firebase/authInit'
+ import firebase from 'firebase'  
   export default {
 
     data: function () {
@@ -81,22 +75,23 @@
     },
 
     methods: {
-      register: function () {
+      register: async function () {
         if (this.email != '' && this.password != '' && this.role != '') {
           this.showError = false
-          signUp(this.email, this.password,this.role)
-    
+           try {
+            const state = await auth.createUserWithEmailAndPassword(this.email, this.password)
+            alert('Account Registered')
+
+          } catch(error) {
+            alert(error.message)
+          }
+
         } else {
+      
           this.showError = true
-          
-
-
         }
-
-
       }
     }
-
   }
 
 </script>

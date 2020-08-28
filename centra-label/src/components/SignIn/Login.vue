@@ -19,7 +19,8 @@
             <input v-model = "password" type="password" id="password">
           </div><br>
           
-        
+
+        </div>
           <div class="form-field">
             <button @click = "login()" class="btn-small waves-effect waves-dark" style="width:30%;">Login</button>
             <button @click = "register()" class="btn-small waves-effect waves-dark red lighten-2" style="width:30%;">Register</button>
@@ -27,40 +28,53 @@
         </div>
         <div v-if="showError" class="center">
               <p class="red-text"> {{'Please check details again'}}</p>
-            </div>
+        </div>
             
 
       </div>
     </div>
   </div>
-  </div>
 </template>
 
 <script>
-  import {signIn}from '@/firebase/addUser'
+  import db from '@/firebase/firestoreInit'
+  import auth from '@/firebase/authInit'
+  import firebase from 'firebase'
   export default {
     data: function (){
       return{
         mail: '',
         password: '',
         showError: false,
+        test: ""
        
         
       }
     },
     methods:  {
-      login: function() {
-         if (this.mail != '' && this.password != '' ){
-           this.showError = false
-           signIn(this.mail, this.password)
-         }else{
-           this.showError = true
-           
+      login: async function() {
+        if (this.mail != '' && this.password != '' ){       
+
+        try {
+         const result = await auth.signInWithEmailAndPassword(this.mail, this.password)
+         console.log(result)
+         alert('Sign in Successful!')
+         this.$store.commit('logIn', this.mail)
+        this.$router.replace({path: '/dataset'})
+
+        } catch (error) {
+          alert(error.message)
+        }
+       }else{
+          this.showError = true
          }
         
     },
+    reroute: function() {
+       this.$router.push("/upload")
+    },
     register: function (){
-       this.$router.push("/Reg")
+       this.$router.push("/register")
     }
 
     }

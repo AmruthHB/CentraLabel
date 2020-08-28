@@ -9,6 +9,7 @@
 import {LabelUI} from '@/components/AnnotateApi'
 import {Navbar} from '@/components/StaticComponents'
 
+
 export default {
   name: 'App',
   components:{

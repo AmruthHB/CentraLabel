@@ -5,9 +5,18 @@ import Vuex from "vuex";
 Vue.use(Vuex);
  
 export default new Vuex.Store({
- modules: {
-   
-
- }
-
+    state: {
+        loggedIn: false,
+        username: "",
+    },
+    mutations: {
+        logIn (state, name) {
+            state.loggedIn = true
+            state.username = name
+        },
+        logOut (state) {
+            state.loggedIn = false
+            state.username = ""
+        },
+    }
 });

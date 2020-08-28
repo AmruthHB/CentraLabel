@@ -11,7 +11,7 @@
     </div>
 
      <div class = "row center">
-        <a @click = "$router.push('/MyDatasets')" class="waves-effect waves-light btn-large">My Datasets</a>
+        <a @click = "$router.push('/mydatasets')" class="waves-effect waves-light btn-large">My Datasets</a>
     </div>
 </div>
 </template>
@@ -24,7 +24,7 @@ export default {
     methods:{
         uploadMenu: function(e){
             //route for some reason says undefined in browser yet works, check that out
-            this.$router.push("/UploadDataset")
+            this.$router.push("/upload")
         }
 
     }

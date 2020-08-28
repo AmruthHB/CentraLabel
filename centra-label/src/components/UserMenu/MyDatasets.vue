@@ -19,7 +19,7 @@
       </div>
    
   </div>
-            
+  <p> </p>
 
 
 </div>
@@ -32,11 +32,15 @@ import db from '@/firebase/firestoreInit'
 
 
 export default {
-created() {
-    
+   data: function () {
+      return {
+      }
+   },
+   methods: {
+   }
+
   }
 
-}
 </script>
 
 <style>

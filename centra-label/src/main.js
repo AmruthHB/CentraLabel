@@ -3,18 +3,28 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import store from './store'
+import store from './store/index'
+import firebase from 'firebase'
+import "firebase/auth";
+import auth from '@/firebase/authInit'
 
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
-let vm = new Vue({
-  el: '#app',
-  router,store,
-  components: { App },
-  template: '<App/>'
-})
 
+let app;
 
-
+auth.onAuthStateChanged(user => {
+  if (user) {
+    store.commit('logIn', user.email)
+  } else {
+    store.commit('logOut')
+  }
+  if (!app) {
+    app = new Vue({
+      router,
+      store,
+      render: h => h(App)
+    }).$mount("#app");
+  }
+});
 
