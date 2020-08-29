@@ -20,7 +20,7 @@
 import Upload from "./Upload";
 
 export default {
-    Name: "Dataset",
+    Name: "Dashboard",
     methods:{
         uploadMenu: function(e){
             //route for some reason says undefined in browser yet works, check that out

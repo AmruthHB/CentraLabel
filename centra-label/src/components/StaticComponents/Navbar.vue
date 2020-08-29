@@ -2,7 +2,7 @@
 <!---Just a future componet to interface with logins so that users can access their data and such -->
   <nav>
     <div class="nav-wrapper">
-      <a v-if = "$store.state.loggedIn" href="#/dataset" class="brand-logo">user: {{$store.state.username}}</a>
+      <a v-if = "$store.state.loggedIn" href="#/dashboard" class="brand-logo">user: {{$store.state.username}}</a>
       <a v-else href="#/login" class="brand-logo"> CentraLabel</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a @click = "logout()">Logout</a></li>

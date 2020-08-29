@@ -61,6 +61,10 @@
 <script>
  import auth from '@/firebase/authInit'
  import firebase from 'firebase'  
+ import 'firebase/firestore'
+ import db from '@/firebase/firestoreInit'
+ 
+
   export default {
 
     data: function () {
@@ -82,7 +86,13 @@
             const state = await auth.createUserWithEmailAndPassword(this.email, this.password)
             alert('Account Registered')
 
+            let data = {}
+            data['accountType'] = this.role
+            console.log(data)
+            db.collection("users").doc(this.email).set(data)
+
           } catch(error) {
+            console.log(error.message)
             alert(error.message)
           }
 

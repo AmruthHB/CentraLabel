@@ -3,10 +3,11 @@ import Router from 'vue-router'
 
 import {Annotation,LabelUI} from '@/components/AnnotateApi'
 import {Login,RegisterUser} from '@/components/SignIn'
-import {Dataset,MyDatasets,Upload} from '@/components/UserMenu'
+import {Dashboard ,MyDatasets,Upload} from '@/components/UserMenu'
 import firebase from 'firebase'
 import "firebase/auth";
 import auth from '@/firebase/authInit'
+import store from '../store'
 
 
 Vue.use(Router)
@@ -38,9 +39,9 @@ const router = new Router({
       meta: { requiresAuth: true }
     },
     {
-      path: '/dataset',
-      name: 'Dataset',
-      component: Dataset,
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: Dashboard,
       meta: { requiresAuth: true }
     }
   ]
@@ -49,10 +50,11 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const isAuthenticated = auth.currentUser;
-  console.log(isAuthenticated)
   console.log("isauthenticated", isAuthenticated);
   if (requiresAuth && !isAuthenticated) {
     next("/login");
+  } else if (store.state.loggedIn && to.name === "Login"){
+    next("/dashboard")
   } else {
     next();
   }

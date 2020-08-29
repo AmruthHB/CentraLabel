@@ -60,7 +60,7 @@
          console.log(result)
          alert('Sign in Successful!')
          this.$store.commit('logIn', this.mail)
-        this.$router.replace({path: '/dataset'})
+        this.$router.replace({path: '/dashboard'})
 
         } catch (error) {
           alert(error.message)

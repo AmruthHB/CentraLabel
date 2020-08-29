@@ -1,9 +1,9 @@
-import Dataset from './Dataset'
+import Dashboard from './Dashboard'
 import MyDatasets from './MyDatasets'
 import Upload from './Upload'
 
 export{
-    Dataset,
+    Dashboard,
     MyDatasets,
     Upload
 }
