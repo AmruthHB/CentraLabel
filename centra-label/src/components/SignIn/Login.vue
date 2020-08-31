@@ -59,8 +59,15 @@
          const result = await auth.signInWithEmailAndPassword(this.mail, this.password)
          console.log(result)
          alert('Sign in Successful!')
+
+         const accessUser = db.collection("users").doc(this.mail)
+         const userData = await accessUser.get()
+         const userDetails = userData.data()
+       
          this.$store.commit('logIn', this.mail)
-        this.$router.replace({path: '/dashboard'})
+         this.$store.commit('addRole',userDetails.accountType)
+         console.log(this.$store.state.userType)
+         this.$router.replace({path: '/dashboard'})
 
         } catch (error) {
           alert(error.message)
@@ -76,7 +83,7 @@
     register: function (){
        this.$router.push("/register")
     }
-
+  
     }
 
   }

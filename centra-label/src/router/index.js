@@ -3,7 +3,7 @@ import Router from 'vue-router'
 
 import {Annotation,LabelUI} from '@/components/AnnotateApi'
 import {Login,RegisterUser} from '@/components/SignIn'
-import {Dashboard ,MyDatasets,Upload} from '@/components/UserMenu'
+import {Dash ,MyDatasets,Upload} from '@/components/UserMenu'
 import firebase from 'firebase'
 import "firebase/auth";
 import auth from '@/firebase/authInit'
@@ -41,7 +41,7 @@ const router = new Router({
     {
       path: '/dashboard',
       name: 'Dashboard',
-      component: Dashboard,
+      component: Dash,
       meta: { requiresAuth: true }
     }
   ]
