@@ -15,7 +15,7 @@
         <div  class="card-action" >
           <p>Images:{{dataset.images}}</p>
           <p>Task:{{dataset.task}}</p>
-           <button  class="btn-small waves-effect waves-dark" style="width:30%;">Access</button>
+           <button @click="click(dataset.name)" class="btn-small waves-effect waves-dark" style="width:30%;">Access</button>
         </div>
 
         
@@ -44,18 +44,26 @@ export default {
    },
    methods: {
      click: function(name) {
-       console.log(name)
-     }
+       let annotationReference = db.collection("users").doc(this.$store.state.username);
+       let updateObject = {}
+
+       let pathToAnnotations = "currentWorkingDataset"
+       updateObject[pathToAnnotations] = name
+        
+       annotationReference.update(updateObject)
+
+       this.$router.push({name: "LabelUI"})
+     },
    },
 
    //click, pass dataset as props into label ui
-   created: async function () {
+   created: async function () { 
+     //getting datset name 
      let user = this.$store.state.username
      let userData = await db.collection("users").doc(user).get()
-     let dataRefs = userData.data() //.datasets
-     let userDatasets = dataRefs.datasets
-     console.log(userDatasets)
-     for(let i = 0; i<userDatasets.length;i++){
+     let userDatasets = userData.data().datasets //.datasets
+ 
+     for(let i = 0; i < userDatasets.length;i++){
        let datasetLoc = userDatasets[i].path.split("/")
        let refAccess = await db.collection(datasetLoc[0]).doc(datasetLoc[1]).get()
        let refData = refAccess.data()
@@ -63,8 +71,8 @@ export default {
        
        let datasetDetails = {
          id:i,
-         name:refData.name ,
-         images:refData.images,
+         name: refData.name,
+         images: refData.images,
          task: refData.task
        }
        this.datasets.push(datasetDetails)

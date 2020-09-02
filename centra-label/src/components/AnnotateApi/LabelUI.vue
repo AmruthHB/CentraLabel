@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col s8 center">
         <h5>Image </h5>
-        <Annotation ref="konvaComp" :key = "componentKey" />
+        <Annotation ref="konvaComp" :key = "componentKey"/>
       </div>
 
       <div class="col s4 center ">
@@ -48,7 +48,7 @@
 
         <div class="col s6">
           <!-- On click event listener here -->
-          <button class="btn waves-effect waves-light " name="action" @click = changeImage(1)>
+          <button class="btn waves-effect waves-light " name="action" @click = changeImage(back)>
             <i class="material-icons right">arrow_back</i>
           </button>
 
@@ -57,7 +57,7 @@
 
         <div class="col s6">
           <!-- On click event listener here -->
-          <button class="btn waves-effect waves-light" type="submit" name="action" @click = changeImage(2)>
+          <button class="btn waves-effect waves-light" type="submit" name="action" @click = changeImage(forwards)>
             <i class="material-icons left">arrow_forward</i>
           </button>
 
@@ -65,11 +65,7 @@
         </div>
 
       </div>
-
     </div>
-
-
-
   </div>
 </template>
 
@@ -86,9 +82,40 @@
     },
     data() {
       return {
-        renderCollection: [],
-        componentKey: 1
-      }
+        renderCollection: {},
+        componentKey: 1,
+        datasetName: null,
+        currentWorkingFile: "", 
+        back: "back",
+        forwards: "forwards",
+        event_listener: null
+        }
+    },
+    async beforeMount() {
+
+      const userData = await db.collection("users").doc(this.$store.state.username).get()
+      const currentWorkingDataset = userData.data().currentWorkingDataset
+      this.datasetName = currentWorkingDataset 
+
+      //console.log(this.datasetName)
+      const currentWorkingFileReference = await db.collection(this.datasetName).doc("Current_Image").get()
+      const currentWorkingFile = currentWorkingFileReference.data().fileName
+      //console.log(currentWorkingFile)
+
+      this.event_listener = db.collection(this.datasetName).doc(currentWorkingFile).onSnapshot((doc) => {
+            let imageInfo = doc.data().Annotations
+            let temparr = []
+            let iterKeys = Object.keys(imageInfo).sort()
+            this.renderCollection = []
+
+            for (let i = 0; i < iterKeys.length; i++) {
+              let informationObj = {
+              "id": Object.keys(imageInfo)[i],
+              "coords": imageInfo[iterKeys[i]].boundingBox
+              }
+            this.renderCollection.push(informationObj)
+            }
+      })
     },
 
     methods: {
@@ -97,67 +124,44 @@
         this.$refs.konvaComp.deleteBox(itemId)
       },
       
-      changeImage: async function (imageId) {
-        let datasetDirectory = "Test-Set"
-        let imageReference = await db.collection(datasetDirectory).doc("Current_Image")
-        let updateObject = {}
+      changeImage: async function (direction) {
+        if (this.$store.state.annotationData.loadState === true) {
+          this.$store.commit("changePageLoadState", false)
+          let imageReference = await db.collection(this.datasetName).doc("Current_Image").get()
+          let updateObject = {}
 
-        this.$refs.konvaComp.currentImageReference = imageId
-        imageId = imageId.toString();
-        //console.log(imageId)
-        updateObject['fileName'] = imageId
-        await imageReference.update(updateObject)
-
-        this.componentKey = ID()
-
-        const currentWorkingFileReference = await db.collection("Test-Set").doc("Current_Image").get()
-        const currentWorkingFile = currentWorkingFileReference.data().fileName
-
-        this.$refs.konvaComp.currentImageReference = currentWorkingFile
-
-        //console.log(this.$refs.konvaComp.currentImageReference)
-        let currentReference = db.collection("Test-Set").doc(currentWorkingFile).onSnapshot((doc) => {
-
-          let imageInfo = doc.data().Annotations
-          let iterKeys = Object.keys(imageInfo)
-
-          this.renderCollection = []
-          for (let i = 0; i < iterKeys.length; i++) {
-
-            let informationObj = {
-              "id": Object.keys(imageInfo)[i],
-              "coords": imageInfo[iterKeys[i]].boundingBox
-            }
-
-            this.renderCollection.push(informationObj)
+          if (direction === "forwards") {        
+            updateObject['fileName'] = (parseInt(imageReference.data().fileName) + 1).toString()
+          } else if (direction === "back" && (parseInt(imageReference.data().fileName) - 1) > 0) {
+            updateObject['fileName'] = (parseInt(imageReference.data().fileName) - 1).toString()
           }
+          await db.collection(this.datasetName).doc("Current_Image").update(updateObject)
 
-        })
+          this.componentKey = ID()
+
+          const currentWorkingFileReference = await db.collection(this.datasetName).doc("Current_Image").get()
+          const currentWorkingFile = currentWorkingFileReference.data().fileName
+
+          this.event_listener();
+          this.event_listener = db.collection(this.datasetName).doc(currentWorkingFile).onSnapshot((doc) => {
+                let imageInfo = doc.data().Annotations
+                let temparr = []
+                let iterKeys = Object.keys(imageInfo).sort()
+                this.renderCollection = []
+
+                for (let i = 0; i < iterKeys.length; i++) {
+                  let informationObj = {
+                  "id": Object.keys(imageInfo)[i],
+                  "coords": imageInfo[iterKeys[i]].boundingBox
+                  }
+                this.renderCollection.push(informationObj)
+                }
+          })
+      } else {
+        alert("Still loading")
+      }
       }
     },
-     mounted: async function() {
-      const currentWorkingFileReference = await db.collection("Test-Set").doc("Current_Image").get()
-      const currentWorkingFile = currentWorkingFileReference.data().fileName
-      this.$refs.konvaComp.currentImageReference = currentWorkingFile
-
-      //console.log(this.$refs.konvaComp.currentImageReference)
-      let currentReference = db.collection("Test-Set").doc(currentWorkingFile).onSnapshot((doc) => {
-
-      let imageInfo = doc.data().Annotations
-      let iterKeys = Object.keys(imageInfo)
-
-      this.renderCollection = []
-      for (let i = 0; i < iterKeys.length; i++) {
-
-        let informationObj = {
-          "id": Object.keys(imageInfo)[i],
-          "coords": imageInfo[iterKeys[i]].boundingBox
-        }
-
-        this.renderCollection.push(informationObj)
-      }
-     })
-  }
 }
 
 </script>
@@ -169,7 +173,7 @@
   }
 
   .label-box {
-    height: 90px;
+    height: 500px;
     overflow-y: scroll;
     margin-bottom: 80px;
   }

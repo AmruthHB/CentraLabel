@@ -88,6 +88,7 @@
 
             let data = {}
             data['accountType'] = this.role
+            data['currentWorkingDataset'] = ''
             console.log(data)
             db.collection("users").doc(this.email).set(data)
 

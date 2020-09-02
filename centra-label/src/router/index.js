@@ -43,6 +43,12 @@ const router = new Router({
       name: 'Dashboard',
       component: Dash,
       meta: { requiresAuth: true }
+    },
+    {
+      path: "/LabelUI",
+      name: "LabelUI",
+      component: LabelUI,
+      meta : {requiresAuth: true}
     }
   ]
 })

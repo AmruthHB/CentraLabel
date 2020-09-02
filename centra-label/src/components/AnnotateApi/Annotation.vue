@@ -45,29 +45,32 @@ export default {
       konvaObjects: {},
       clickCounter: 0,
       keyPoints: ["foo","foo"],
-      rect1: null,
-      tr1: null,
-      currentImageReference: null
+      rectangle_object: null,
+      transformer_object: null,
+      currentImageReference: null,
+      dataset: null
+
       };
   },
   async beforeMount() {
-
+    const userData = await db.collection("users").doc(this.$store.state.username).get()
+    const currentWorkingDataset = userData.data().currentWorkingDataset
+    this.dataset = currentWorkingDataset;       
+    
     //create an imageObject
     const image = new Image();
-    console.log("Reset")
     //prototype directory
-    let datasetDirectory = "Test-Set"
-
     //retrieve annotation object and url object
-    let currentData = await getInfo(datasetDirectory)
-
+    let currentData = await getInfo(this.dataset)
     //annotation object and url object links
     let currentAnnotations = currentData.annotationObject
     let currentImage = currentData.link
 
+    const currentWorkingFileReference = await db.collection(this.dataset).doc("Current_Image").get()
+    this.currentImageReference = currentWorkingFileReference.data().fileName
     //get https url and set it to image source
     image.src = await getLink(currentImage)
-    
+
     //load image
     image.onload = () => {
       // set image only when it is loaded
@@ -77,11 +80,11 @@ export default {
     };
     
     //bboxObj is the 10 string random ID for each bounding box, the key corresponds to the properties ...
-    // 'boundingBox' - an object with x_min, y_min and so on
+    //'boundingBox' - an object with x_min, y_min and so on
     //'class' - the class of the image
     for (let bboxObj in currentAnnotations) {
 
-      this.rect1 = new Konva.Rect({
+      this.rectangle_object = new Konva.Rect({
           x: currentAnnotations[bboxObj]['boundingBox']['x_min'],
           y: currentAnnotations[bboxObj]['boundingBox']['y_min'],
           width: currentAnnotations[bboxObj]['boundingBox']['x_max'] - currentAnnotations[bboxObj]['boundingBox']['x_min'],
@@ -92,8 +95,8 @@ export default {
           id: bboxObj
       });
 
-      this.tr1 = new Konva.Transformer({
-          nodes: [this.rect1],
+      this.transformer_object = new Konva.Transformer({
+          nodes: [this.rectangle_object],
           centeredScaling: false,
           rotateEnabled: false,
           resizeEnabled: true,
@@ -107,20 +110,21 @@ export default {
       });
 
       this.konvaObjects[bboxObj] = {
-        transformerObj: this.tr1,
-        rectangleObj: this.rect1
+        transformerObj: this.transformer_object,
+        rectangleObj: this.rectangle_object
       }
       
-      this.rect1.on("transformend", this.updateCoordinatesOnTransform);
-      this.rect1.on("dragend", this.updateCoordinatesOnTransform); 
+      this.rectangle_object.on("transformend", this.updateCoordinatesOnTransform);
+      this.rectangle_object.on("dragend", this.updateCoordinatesOnTransform); 
 
-      this.$refs.annotation.getNode().add(this.rect1);
-      this.$refs.annotation.getNode().add(this.tr1);
+      this.$refs.annotation.getNode().add(this.rectangle_object);
+      this.$refs.annotation.getNode().add(this.transformer_object);
       this.$refs.annotation.getNode().draw();
-
-    }
-  },
-
+      }
+    },
+    async updated () {
+      this.$store.commit("changePageLoadState", true)
+    },
 
   methods: {
     updateCoordinatesOnTransform(event) {
@@ -130,7 +134,7 @@ export default {
             y_max: event.target.getClientRect().y + event.target.getClientRect().height,
             y_min: event.target.getClientRect().y
       }
-      updateImageAnnotation("Test-Set", this.currentImageReference, event.target.attrs.id, tempObject)
+      updateImageAnnotation(this.dataset, this.currentImageReference, event.target.attrs.id, tempObject)
       },
 
     drawBox(e) {
@@ -148,7 +152,7 @@ export default {
         let randomIdentifier = ID()
         //saving second point of click
         this.keyPoints[1] = [x_mouse, y_mouse]
-        this.rect1 = new Konva.Rect({
+        this.rectangle_object = new Konva.Rect({
           x: this.keyPoints[0][0],
           y: this.keyPoints[0][1],
           width: this.keyPoints[1][0] - this.keyPoints[0][0],
@@ -158,8 +162,8 @@ export default {
           draggable: true,
           id: randomIdentifier
       });
-        this.tr1 = new Konva.Transformer({
-          nodes: [this.rect1],
+        this.transformer_object = new Konva.Transformer({
+          nodes: [this.rectangle_object],
           centeredScaling: false,
           rotateEnabled: false,
           resizeEnabled: true,
@@ -172,46 +176,46 @@ export default {
           borderStroke: 'black'
       });
     
-      this.rect1.on("transformend", this.updateCoordinatesOnTransform);
-      this.rect1.on("dragend", this.updateCoordinatesOnTransform); 
+      this.rectangle_object.on("transformend", this.updateCoordinatesOnTransform);
+      this.rectangle_object.on("dragend", this.updateCoordinatesOnTransform); 
       
       this.konvaObjects[randomIdentifier] = {
-        rectangleObj: this.rect1,
-        transformerObj: this.tr1
+        rectangleObj: this.rectangle_object,
+        transformerObj: this.transformer_object
       }
       //updating layer to include the new transformer
-      this.$refs.annotation.getNode().add(this.tr1);
+      this.$refs.annotation.getNode().add(this.transformer_object);
 
       //resetting global variables
       this.keyPoints = ["foo","foo"]
       this.clickCounter = 0;
      
       //adding rectangle and updating the canvas
-      this.$refs.annotation.getNode().add(this.rect1);
+      this.$refs.annotation.getNode().add(this.rectangle_object);
       this.$refs.annotation.getNode().draw();
       
       let temp = {
           boundingBox: {
-            x_max: this.rect1.getClientRect().x + this.rect1.getClientRect().width,
-            x_min: this.rect1.getClientRect().x,
-            y_max: this.rect1.getClientRect().y + this.rect1.getClientRect().height,
-            y_min: this.rect1.getClientRect().y
+            x_max: this.rectangle_object.getClientRect().x + this.rectangle_object.getClientRect().width,
+            x_min: this.rectangle_object.getClientRect().x,
+            y_max: this.rectangle_object.getClientRect().y + this.rectangle_object.getClientRect().height,
+            y_min: this.rectangle_object.getClientRect().y
           },
           class: "cow"
       }
 
-      addImageAnnotation("Test-Set", this.currentImageReference, randomIdentifier, temp)
+      addImageAnnotation(this.dataset, this.currentImageReference, randomIdentifier, temp)
       }
       },
       deleteBox(idOfImage) {
-        deleteElement("Test-Set", this.currentImageReference, idOfImage)
+        deleteElement(this.dataset, this.currentImageReference, idOfImage)
         this.konvaObjects[idOfImage].transformerObj.detach()
 
         this.konvaObjects[idOfImage].rectangleObj.destroy()
         delete this.konvaObjects[idOfImage]
-
         this.$refs.annotation.getNode().draw();
       },
+      
   }
 };
 </script>

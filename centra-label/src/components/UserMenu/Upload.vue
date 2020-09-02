@@ -100,7 +100,8 @@ import {ID} from "@/database-scripts/randomString.js"
         }else{
           for(let i = 0; i < this.uploadData.length;i++){
             let upload = this.uploadData[i]
-            this.storageRef.child(`${this.datasetName}/image${(i+1).toString()}.${this.dataFormat[i]}`).put(upload)
+            this.storageRef.child(`${this.datasetName}/${(i+1).toString()}.${this.dataFormat[i]}`).put(upload)
+            console.log(`${this.datasetName}/${(i+1).toString()}.${this.dataFormat[i]}`)
           }
           this.showProgress = false
       }

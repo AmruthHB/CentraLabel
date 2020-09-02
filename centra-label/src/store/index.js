@@ -9,13 +9,15 @@ export default new Vuex.Store({
         loggedIn: false,
         username: "",
         userType: "",
-        currentDataset:""
+        annotationData: {
+            loadState: true,
+            dataset_name: ""
+        }
     },
     mutations: {
         logIn (state, name) {
             state.loggedIn = true
             state.username = name
-           
         },
         logOut (state) {
             state.loggedIn = false
@@ -24,8 +26,11 @@ export default new Vuex.Store({
         addRole (state,role){
             state.userType = role
         },
-        datasetAccessed(state,datasetRef){
-            state.currentDataset = datasetRef
+        changePageLoadState (state, status) {
+            state.annotationData.loadState = status
+        },
+        setDatasetName (state, name) {
+            state.annotationData.dataset_name = name
         }
     }
 });
