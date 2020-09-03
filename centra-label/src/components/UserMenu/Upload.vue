@@ -113,7 +113,8 @@ import {ID} from "@/database-scripts/randomString.js"
         for(let i = 0;i < this.uploadData.length;i++){
           newBucket.doc((i+1).toString()).set({
             Annotations: {},
-            filePath: `${this.datasetName}/${i+1}.${this.dataFormat[i]}`
+            filePath: `${this.datasetName}/${i+1}.${this.dataFormat[i]}`,
+            renderList: []
           }).then(function(){
 
             newBucket.doc("Current_Image").set({

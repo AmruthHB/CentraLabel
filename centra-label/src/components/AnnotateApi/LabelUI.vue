@@ -13,7 +13,7 @@
 
       <div class="col s4 center ">
         <h5>My Annotations</h5>
-        <div class="label-box">
+        <div class="label-box" ref="labelbox">
           <div class="card" v-for="a in renderCollection" :key="a.id">
             <div class="card-content">
 
@@ -92,7 +92,6 @@
         }
     },
     async beforeMount() {
-
       const userData = await db.collection("users").doc(this.$store.state.username).get()
       const currentWorkingDataset = userData.data().currentWorkingDataset
       this.datasetName = currentWorkingDataset 
@@ -103,21 +102,22 @@
       //console.log(currentWorkingFile)
 
       this.event_listener = db.collection(this.datasetName).doc(currentWorkingFile).onSnapshot((doc) => {
-            let imageInfo = doc.data().Annotations
-            let temparr = []
-            let iterKeys = Object.keys(imageInfo).sort()
+            let renderList = doc.data().renderList
             this.renderCollection = []
 
-            for (let i = 0; i < iterKeys.length; i++) {
+            for (let i = 0; i < renderList.length; i++) {
+              let iter_Annotation = doc.data().Annotations[renderList[i]]
               let informationObj = {
-              "id": Object.keys(imageInfo)[i],
-              "coords": imageInfo[iterKeys[i]].boundingBox
+              "id": renderList[i],
+              "coords": iter_Annotation.boundingBox
               }
             this.renderCollection.push(informationObj)
             }
       })
     },
-
+    updated() {
+      this.$refs.labelbox.scrollTop = 100000;
+    },
     methods: {
       destroyBox: function (item, itemId) {
         console.log(itemId)
@@ -144,21 +144,20 @@
 
           this.event_listener();
           this.event_listener = db.collection(this.datasetName).doc(currentWorkingFile).onSnapshot((doc) => {
-                let imageInfo = doc.data().Annotations
-                let temparr = []
-                let iterKeys = Object.keys(imageInfo).sort()
-                this.renderCollection = []
+                      let renderList = doc.data().renderList
+                      this.renderCollection = []
 
-                for (let i = 0; i < iterKeys.length; i++) {
-                  let informationObj = {
-                  "id": Object.keys(imageInfo)[i],
-                  "coords": imageInfo[iterKeys[i]].boundingBox
-                  }
-                this.renderCollection.push(informationObj)
-                }
-          })
+                      for (let i = 0; i < renderList.length; i++) {
+                        let iter_Annotation = doc.data().Annotations[renderList[i]]
+                        let informationObj = {
+                        "id": renderList[i],
+                        "coords": iter_Annotation.boundingBox
+                        }
+                      this.renderCollection.push(informationObj)
+                      }
+                })
       } else {
-        alert("Still loading")
+        alert("Woah there buddy! Slow down! You're pressing buttons too fast, wait for things to load!")
       }
       }
     },
