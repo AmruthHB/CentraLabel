@@ -7,7 +7,7 @@ import store from './store/index'
 import firebase from 'firebase'
 import "firebase/auth";
 import auth from '@/firebase/authInit'
-
+import db from '@/firebase/firestoreInit'
 Vue.config.productionTip = false
 
 
@@ -16,6 +16,17 @@ let app;
 auth.onAuthStateChanged(user => {
   if (user) {
     store.commit('logIn', user.email)
+    async function getRole(){
+      let userData = await db.collection("users").doc(user.email).get()
+      return userData
+      
+    }
+    let dataResult = getRole()
+    console.log(dataResult)
+    store.commit('addRole',dataResult.accountType)
+    
+
+
   } else {
     store.commit('logOut')
   }

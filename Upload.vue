@@ -22,7 +22,6 @@
   </div>
   
     <div class = "choosers">
-       <label>Status</label>
               <p>
                 <label class = "pubpriv">
                   <input value = "public" v-model = "datasetStatus" class="with-gap" name="group1" type="radio" />
@@ -32,22 +31,6 @@
                 <label class = "pubpriv" >
                   <input value = "private" v-model = "datasetStatus" class="with-gap" name="group1" type="radio" />
                   <span>Private</span>
-                </label>
-            
-              </p>
-
-            </div>
-      <div class = "choosers">
-       <label>Task type</label>
-              <p>
-                <label class = "status">
-                  <input value = "annotation" v-model = "taskType" class="with-gap" name="group2" type="radio" />
-                  <span>Annotate</span>
-                </label>
-
-                <label class = "status" >
-                  <input value = "labelling" v-model = "taskType" class="with-gap" name="group2" type="radio" />
-                  <span>Label</span>
                 </label>
             
               </p>
@@ -71,7 +54,16 @@
 
 
     </div>
+     <div class="row ">
+      <div class="card ">
+        <div class="card-content white-text">
+          <span class="card-title">Dataset Details</span>
+          <p>Images: {{dataFormat.length}}</p>
+          <p>Status: {{datasetStatus}}</p>
+        </div>
+      </div>
 
+    </div>
     
 
     <div class="row center">
@@ -81,7 +73,7 @@
 
     </div>
 
-    <div class="row center" v-if = 'showProgress === true'>
+    <div class="row center" v-if = 'showProgress'>
       <div class="progress">
       <div class="indeterminate"></div>
   </div>
@@ -101,9 +93,8 @@ import {ID} from "@/database-scripts/randomString.js"
     data() {
       return{
       datasetName: "",
-      bountyOffer: 0,
+      bountyOffer: null,
       datasetStatus: "",
-      taskType: "",
       showProgress: false,
       uploadData: [],
       dataFormat: [],
@@ -113,7 +104,7 @@ import {ID} from "@/database-scripts/randomString.js"
 
     methods: {
       //takes in normal seperated data, as well as zip files. grabs the actual files as wells as the file extensions for upload
-      assignData:function(event){
+      assignData(event){
         ///prototype: assume that all data types can be unzipped, actual product add promises for error handling
         
         let recieved = event.target.files
@@ -128,15 +119,13 @@ import {ID} from "@/database-scripts/randomString.js"
         
       },
 
-      runOrder:function(){
+      runOrder(){
         this.createDataset()
         this.createBucket()
-        this.createInfo()
-        this.addtoCreator()
 
       }
 
-      ,createDataset:function(){
+      ,createDataset(){
         
         this.showProgress = true
         if(this.datasetName === ""){
@@ -156,14 +145,13 @@ import {ID} from "@/database-scripts/randomString.js"
       }
       },
 
-      createBucket:async function(){
-        let newBucket = db.collection(this.datasetName)
+      createBucket(){
+        let newBucket = db.collection("public-datasets").doc(this.datasetName)
 
         for(let i = 0;i < this.uploadData.length;i++){
           newBucket.doc((i+1).toString()).set({
             Annotations: {},
-            filePath: `${this.datasetName}/${i+1}.${this.dataFormat[i]}`,
-            renderList: []
+            filePath: `${this.datasetName}/${i+1}.${this.dataFormat[i]}`
           }).then(function(){
 
             newBucket.doc("Current_Image").set({
@@ -171,30 +159,7 @@ import {ID} from "@/database-scripts/randomString.js"
             })
           })
         }
-      },
-      createInfo: async function(){
-        let datasetInfo = {
-          bounty:this.bountyOffer,
-          images: this.dataFormat.length,
-          status: this.datasetStatus,
-          task: this.taskType,
-          user:this.$store.state.username
-        }
-        let newBucket = await db.collection('public-datasets').doc(this.datasetName).set(datasetInfo)
-
-        
-      },
-      addtoCreator: async function () {
-        const datasetRef = db.collection('public-datasets').doc(this.datasetName)
-        const user = db.collection("users").doc(this.$store.state.username)
-
-
-        const retrieve = await user.get()
-        let userData = retrieve.data().datasets
-        userData.push(datasetRef)
-        
-        const updateUser = await user.update({datasets:userData})
-}
+      }
     }
 
   }
@@ -210,10 +175,5 @@ import {ID} from "@/database-scripts/randomString.js"
   .pubpriv{
     margin-left: 20%;
   }
-
-  .status{
-     margin-left: 20%;
-  }
-  
 
 </style>

@@ -33,7 +33,7 @@ export default {
         }
       
     },
-    mounted(){
+    created(){
         this.role = this.$store.state.userType
         console.log(this.role)
 
