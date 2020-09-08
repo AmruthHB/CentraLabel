@@ -174,11 +174,13 @@ import {ID} from "@/database-scripts/randomString.js"
       },
       createInfo: async function(){
         let datasetInfo = {
+          name: this.datasetName,
           bounty:this.bountyOffer,
           images: this.dataFormat.length,
           status: this.datasetStatus,
           task: this.taskType,
-          user:this.$store.state.username
+          user:this.$store.state.username,
+          labels:[]
         }
         let newBucket = await db.collection('public-datasets').doc(this.datasetName).set(datasetInfo)
 

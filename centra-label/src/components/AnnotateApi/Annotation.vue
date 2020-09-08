@@ -52,6 +52,7 @@ export default {
 
       };
   },
+  props: ['useLabel'],
   async beforeMount() {
     const userData = await db.collection("users").doc(this.$store.state.username).get()
     const currentWorkingDataset = userData.data().currentWorkingDataset
@@ -201,7 +202,7 @@ export default {
             y_max: this.rectangle_object.getClientRect().y + this.rectangle_object.getClientRect().height,
             y_min: this.rectangle_object.getClientRect().y
           },
-          class: "cow"
+          class: this.useLabel
       }
 
       addImageAnnotation(this.dataset, this.currentImageReference, randomIdentifier, temp)
