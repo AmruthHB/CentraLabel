@@ -138,7 +138,7 @@
       //
       const datasetDetails = await db.collection("public-datasets").doc(currentWorkingDataset).get()
       this.labels = datasetDetails.data().labels
-      console.log(this.labels)
+      //console.log(this.labels)
       //console.log(this.datasetName)
       const currentWorkingFileReference = await db.collection(this.datasetName).doc("Current_Image").get()
       const currentWorkingFile = currentWorkingFileReference.data().fileName
@@ -147,11 +147,11 @@
       this.event_listener = db.collection(this.datasetName).doc(currentWorkingFile).onSnapshot((doc) => {
         let renderList = doc.data().renderList
         this.renderCollection = []
-        console.log(doc.data())
+        //console.log(doc.data())
 
         for (let i = 0; i < renderList.length; i++) {
           let iter_Annotation = doc.data().Annotations[renderList[i]]
-          console.log(iter_Annotation.class)
+          //console.log(iter_Annotation.class)
           let informationObj = {
             "id": renderList[i],
             "coords": iter_Annotation.boundingBox,
