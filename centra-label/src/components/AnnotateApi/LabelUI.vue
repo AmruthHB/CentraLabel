@@ -56,13 +56,13 @@
               <div class="row center">
                 <div class="col s6">
 
-                  <p>X1: {{Math.round(a.coords.x_max)}} </p>
-                  <p>X2: {{Math.round(a.coords.x_min)}}</p>
+                  <p>X1: {{Math.round(a.coords.x_min)}} </p>
+                  <p>X2: {{Math.round(a.coords.x_max)}}</p>
                 </div>
 
                 <div class="col s6 center">
-                  <p>Y1: {{Math.round(a.coords.y_max)}}</p>
-                  <p>Y2: {{Math.round(a.coords.y_min)}}</p>
+                  <p>Y1: {{Math.round(a.coords.y_min)}}</p>
+                  <p>Y2: {{Math.round(a.coords.y_max)}}</p>
                 </div>
               </div>
 
